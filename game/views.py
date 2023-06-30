@@ -23,8 +23,16 @@ class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
     filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
     ordering_fields = ['rarity_id', 'id']
-    filterset_fields = ['rarity_id', 'id']
+    filterset_fields = ['rarity_id']
 
+    def list(self, request, *args, **kwargs):
+        id = request.query_params.get('id')
+        if id is not None:
+            obj = get_object_or_404(self.queryset, id=id)
+            serializer = self.get_serializer(obj)
+            return Response(serializer.data)
+
+        return super().list(request, *args, **kwargs)
 
 class RarityViewSet(viewsets.ModelViewSet):
     """
@@ -34,7 +42,16 @@ class RarityViewSet(viewsets.ModelViewSet):
     serializer_class = RaritySerializer
     filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
     ordering_fields = ['game_id', 'id']
-    filterset_fields = ['game_id', 'id']
+    filterset_fields = ['game_id']
+
+    def list(self, request, *args, **kwargs):
+        id = request.query_params.get('id')
+        if id is not None:
+            obj = get_object_or_404(self.queryset, id=id)
+            serializer = self.get_serializer(obj)
+            return Response(serializer.data)
+
+        return super().list(request, *args, **kwargs)
     
 
 class GameViewSet(viewsets.ModelViewSet):
@@ -43,9 +60,17 @@ class GameViewSet(viewsets.ModelViewSet):
     """
     queryset = Game.objects.all()
     serializer_class = GameSerializer
-    filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
+    filter_backends = [filters.OrderingFilter]
     ordering_fields = ['id']
-    filterset_fields = ['id']
+    
+    def list(self, request, *args, **kwargs):
+        id = request.query_params.get('id')
+        if id is not None:
+            obj = get_object_or_404(self.queryset, id=id)
+            serializer = self.get_serializer(obj)
+            return Response(serializer.data)
+
+        return super().list(request, *args, **kwargs)
     
 
 class Gacha(APIView):
