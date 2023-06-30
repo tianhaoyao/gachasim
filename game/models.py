@@ -10,9 +10,9 @@ class Game(models.Model):
     def __str__(self):
         return self.game_name
 
-class Rate(models.Model):
+class Rarity(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
-    rarity = models.IntegerField(default=0)
+    rarity_name = models.CharField(max_length=200)
     chance = models.FloatField(default=0)
     pity = models.IntegerField(default=0)
     softpity = models.IntegerField(default=0)
@@ -20,10 +20,10 @@ class Rate(models.Model):
     color = ColorField(default='#FF0000')
 
     def __str__(self):
-        return str(self.game.game_name + str(self.rarity))
-
+        return "{}-{}".format(self.game.game_name, str(self.rarity))
+    
 class Item(models.Model):
-    rate = models.ForeignKey(Rate, on_delete=models.CASCADE)
+    rarity = models.ForeignKey(Rarity, on_delete=models.CASCADE)
     item_name = models.CharField(max_length=200)
     image = models.ImageField(upload_to ='game/uploads/')
     chance = models.FloatField(default=0)

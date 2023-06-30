@@ -5,7 +5,7 @@ from . import views
 
 router = routers.DefaultRouter()
 router.register(r'items', views.ItemViewSet)
-router.register(r'rates', views.RateViewSet)
+router.register(r'rarities', views.RarityViewSet)
 router.register(r'games', views.GameViewSet)
 
 app_name = "game"

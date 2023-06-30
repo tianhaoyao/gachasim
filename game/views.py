@@ -11,24 +11,24 @@ import django_filters
 from rest_framework import filters, viewsets
 from rest_framework import permissions
 from django.core import serializers
-from .serializer import RateSerializer, ItemSerializer, GameSerializer
-from .models import Game, Rate, Item
+from .serializer import RaritySerializer, ItemSerializer, GameSerializer
+from .models import Game, Rarity, Item
 import random
 
 class ItemViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows items to be viewed or edited.
     """
-    queryset = Item.objects.all().order_by('rate')
+    queryset = Item.objects.all().order_by('rarity')
     serializer_class = ItemSerializer
 
 
-class RateViewSet(viewsets.ModelViewSet):
+class RarityViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows rates to be viewed or edited.
+    API endpoint that allows rarities to be viewed or edited.
     """
-    queryset = Rate.objects.all()
-    serializer_class = RateSerializer
+    queryset = Rarity.objects.all()
+    serializer_class = RaritySerializer
     def get_queryset(self):
         queryset = self.queryset
         game = self.request.query_params.get('game')
@@ -40,7 +40,7 @@ class RateViewSet(viewsets.ModelViewSet):
 
 class GameViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows rates to be viewed or edited.
+    API endpoint that allows games to be viewed or edited.
     """
     queryset = Game.objects.all()
     serializer_class = GameSerializer
@@ -52,7 +52,7 @@ class Gacha(APIView):
     choices = []
     weights = []
     currpity = dict()
-    ratelookup = dict()
+    raritylookup = dict()
     softpity = dict()
     softpitychance = dict()
     itemLookup = dict()
@@ -60,22 +60,22 @@ class Gacha(APIView):
 
     def populate(self, game_id):
         game = get_object_or_404(Game, pk=game_id)
-        rates = game.rate_set.all()
-        for rate in rates:
-            self.ratelookup[rate.rarity] = rate
-            self.choices.append(rate.rarity)
-            self.weights.append(rate.chance)
-            if rate.pity != 0:
-                self.pity[rate.rarity] = rate.pity
-                if rate.softpity != 0:
-                    self.softpity[rate.rarity] = rate.softpity
-                    self.softpitychance[rate.rarity] = rate.softpitychance
-            items = rate.item_set.all()
-            self.itemChanceLookup[rate.rarity] = {"itemname": [], "chance": []}
+        rarities = game.rarity_set.all()
+        for rarity in rarities:
+            self.raritylookup[rarity.rarity_name] = rarity
+            self.choices.append(rarity.rarity_name)
+            self.weights.append(rarity.chance)
+            if rarity.pity != 0:
+                self.pity[rarity.rarity_name] = rarity.pity
+                if rarity.softpity != 0:
+                    self.softpity[rarity.rarity_name] = rarity.softpity
+                    self.softpitychance[rarity.rarity_name] = rarity.softpitychance
+            items = rarity.item_set.all()
+            self.itemChanceLookup[rarity.rarity_name] = {"itemname": [], "chance": []}
             for item in items:
                 self.itemLookup[item.item_name] = item
-                self.itemChanceLookup[rate.rarity]["itemname"].append(item.item_name)
-                self.itemChanceLookup[rate.rarity]["chance"].append(item.chance)
+                self.itemChanceLookup[rarity.rarity_name]["itemname"].append(item.item_name)
+                self.itemChanceLookup[rarity.rarity_name]["chance"].append(item.chance)
         self.currpity = self.pity.copy()
         for key in self.currpity:
             self.currpity[key] = 0
@@ -130,8 +130,8 @@ class Gacha(APIView):
         for key in self.currpity:
             self.currpity[key] += 1
 
-    def get_item(self, rate):
-        item_names, item_chances = self.itemChanceLookup[rate]["itemname"], self.itemChanceLookup[rate]["chance"]
+    def get_item(self, rarity):
+        item_names, item_chances = self.itemChanceLookup[rarity]["itemname"], self.itemChanceLookup[rarity]["chance"]
         roll = random.choices(item_names, item_chances)[0]
         return self.itemLookup[roll]
     
@@ -141,11 +141,11 @@ class Gacha(APIView):
         numrolls = int(request.GET.get('numrolls', ''))
         res = []
         for i in range(numrolls):
-            rate = self.roll()
-            roll = RateSerializer(self.ratelookup[rate]).data
-            item = ItemSerializer(self.get_item(rate)).data
+            rarity = self.roll()
+            roll = RaritySerializer(self.raritylookup[rarity]).data
+            item = ItemSerializer(self.get_item(rarity)).data
             print(self.currpity)
-            res.append({"rate": roll, "item": item, "pity": self.currpity.copy()})
+            res.append({"rarity": roll, "item": item, "pity": self.currpity.copy()})
         
         return Response(res)
 
