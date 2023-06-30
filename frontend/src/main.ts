@@ -15,6 +15,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     // Define your routes here
+    {path: '', redirect: '/home'},
     { path: '/home', component: GameSelection },
     { path: '/create', component: CreateNew },
     { path: '/create/item', component: CreateNewItem },

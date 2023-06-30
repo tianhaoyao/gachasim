@@ -46,7 +46,7 @@
     </form>
 </template>
   
-<script>
+<script lang="ts">
 import axios from 'axios'
 
 export default {
@@ -71,7 +71,7 @@ export default {
         this.fetchGames();
     },
     methods: {
-        submitForm(event) {
+        submitForm(event: Event) {
             event.preventDefault();
             // Validate the form fields and construct the request payload
             if (this.includePity && !this.form.pity) {
@@ -105,9 +105,6 @@ export default {
                     console.log(payload)
                     console.log(error.response)
                 });
-        },
-        handleImageChange(event) {
-            this.image = event.target.files[0];
         },
         fetchGames() {
             axios.get('/game/games/')
