@@ -1,11 +1,12 @@
 <template>
   <router-link to="/home" class="button">DONE</router-link>
   <form @submit="submitForm">
-
     <label for="game">Game:</label>
     <select v-model="gameid" @change="loadRates">
-      {{rates}}
-      <option v-for="game in games" :key="game.id" :value="game.id" >{{ game.game_name }}</option>
+      {{
+        rates
+      }}
+      <option v-for="game in games" :key="game.id" :value="game.id">{{ game.game_name }}</option>
     </select>
 
     <label for="rate">Rate:</label>
@@ -14,20 +15,20 @@
     </select>
 
     <label for="item_name">Item Name:</label>
-    <input type="text" id="item_name" v-model="itemName" required>
+    <input type="text" id="item_name" v-model="itemName" required />
 
     <label for="image">Image:</label>
-    <input type="file" id="image" @change="handleImageChange" required>
+    <input type="file" id="image" @change="handleImageChange" required />
 
     <label for="chance">Chance:</label>
-    <input type="float" id="chance" v-model="chance" required>
-    rate:{{ rate }} itename:{{  itemName }} image: {{ image }} chance{{ chance   }}
+    <input type="float" id="chance" v-model="chance" required />
+    rate:{{ rate }} itename:{{ itemName }} image: {{ image }} chance{{ chance }}
     <button type="submit">Submit</button>
   </form>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
 
 export default {
   name: 'CreateNewItem',
@@ -53,56 +54,55 @@ export default {
       formData.append('item_name', this.itemName);
       formData.append('image', this.image);
       formData.append('chance', parseFloat(this.chance));
-      console.log('data', {rate: this.rate, itemName: this.itemName});
-      console.log(this.itemName)
-      console.log(this.chance)
-      console.log(this.image)
+      console.log('data', { rate: this.rate, itemName: this.itemName });
+      console.log(this.itemName);
+      console.log(this.chance);
+      console.log(this.image);
 
-      axios.post('/game/items/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-        .then(response => {
+      axios
+        .post('/game/items/', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+        .then((response) => {
           console.log(response.data);
           // Handle success response
-          console.log(formData)
+          console.log(formData);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error(error);
-          console.log(formData)
-          console.log(error.response)
+          console.log(formData);
+          console.log(error.response);
         });
     },
     handleImageChange(event) {
       this.image = event.target.files[0];
     },
     fetchGames() {
-      axios.get('/game/games/')
-        .then(response => {
+      axios
+        .get('/game/games/')
+        .then((response) => {
           this.games = response.data;
-          console.log(this.games)
+          console.log(this.games);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error(error);
         });
     },
     loadRates() {
-      axios.get(`/game/rates/`, { params: { game: this.gameid } })
-        .then(response => {
+      axios
+        .get(`/game/rates/`, { params: { game: this.gameid } })
+        .then((response) => {
           this.rates = response.data;
-          console.log(this.gameid)
+          console.log(this.gameid);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error(error);
         });
     },
-    
-  }
-
-
-}
+  },
+};
 </script>
 
-<style>
-</style>
+<style></style>
