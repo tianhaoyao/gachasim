@@ -4,6 +4,7 @@ import App from './App.vue';
 import CreateNew from './components/CreateNew.vue';
 import CreateNewItem from './components/CreateNewItem.vue';
 import CreateNewRate from './components/CreateNewRate.vue';
+import CreateNewGame from './components/CreateNewGame.vue';
 import GameSelection from './components/GameSelection.vue';
 import axios from 'axios';
 import 'bootstrap';
@@ -19,7 +20,7 @@ const router = createRouter({
     { path: '/home', component: GameSelection },
     { path: '/create', component: CreateNew },
     { path: '/create/item', component: CreateNewItem },
-    // { path: '/create/game', component: CreateItem },
+    { path: '/create/game', component: CreateNewGame },
     { path: '/create/rate', component: CreateNewRate },
   ],
 });
