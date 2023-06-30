@@ -19,8 +19,11 @@ class ItemViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows items to be viewed or edited.
     """
-    queryset = Item.objects.all().order_by('rarity')
+    queryset = Item.objects.all()
     serializer_class = ItemSerializer
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
+    ordering_fields = ['rarity_id', 'id']
+    filterset_fields = ['rarity_id', 'id']
 
 
 class RarityViewSet(viewsets.ModelViewSet):
@@ -29,13 +32,9 @@ class RarityViewSet(viewsets.ModelViewSet):
     """
     queryset = Rarity.objects.all()
     serializer_class = RaritySerializer
-    def get_queryset(self):
-        queryset = self.queryset
-        game = self.request.query_params.get('game')
-        if not game:
-            return queryset
-        query_set = queryset.filter(game=game)
-        return query_set
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
+    ordering_fields = ['game_id', 'id']
+    filterset_fields = ['game_id', 'id']
     
 
 class GameViewSet(viewsets.ModelViewSet):
@@ -44,6 +43,9 @@ class GameViewSet(viewsets.ModelViewSet):
     """
     queryset = Game.objects.all()
     serializer_class = GameSerializer
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
+    ordering_fields = ['id']
+    filterset_fields = ['id']
     
 
 class Gacha(APIView):
@@ -148,8 +150,4 @@ class Gacha(APIView):
             res.append({"rarity": roll, "item": item, "pity": self.currpity.copy()})
         
         return Response(res)
-
-class GameView(APIView):
-    def get(self, request, game_id):
-        game = GameSerializer(get_object_or_404(Game, pk=game_id)).data
-        return Response(game)
+    

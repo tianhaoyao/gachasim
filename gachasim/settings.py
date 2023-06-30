@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'colorfield',
+    'django_filters',
     'rest_framework',
     'corsheaders',
 ]
@@ -77,7 +78,6 @@ TEMPLATES = [
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    # other settings...
 }
 
 WSGI_APPLICATION = 'gachasim.wsgi.application'

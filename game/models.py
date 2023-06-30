@@ -20,7 +20,7 @@ class Rarity(models.Model):
     color = ColorField(default='#FF0000')
 
     def __str__(self):
-        return "{}-{}".format(self.game.game_name, str(self.rarity))
+        return "{}-{}".format(self.game.game_name, str(self.rarity_name))
     
 class Item(models.Model):
     rarity = models.ForeignKey(Rarity, on_delete=models.CASCADE)
