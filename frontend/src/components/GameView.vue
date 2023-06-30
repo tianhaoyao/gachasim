@@ -1,5 +1,5 @@
 <template>
-  <img :src="'http://127.0.0.1:8000' + game?.image" />
+  <img v-if="game?.image" :src="game.image" />
   <div class="game">
     <input v-model="numRolls" number />
     <button v-on:click="roll()">Reroll</button>
@@ -69,7 +69,7 @@ export default defineComponent({
     },
     getImage: function () {
       axios
-        .get(`/game/${this.gameId}/`)
+        .get(`/game/games/`, { params: { id: this.gameId } })
         .then((response) => {
           this.game = response.data;
         })
@@ -79,7 +79,7 @@ export default defineComponent({
     },
     getRatesInfo: function () {
       axios
-        .get(`/game/rates/`, { params: { game: this.gameId } })
+        .get(`/game/rarities/`, { params: { game: this.gameId } })
         .then((response) => {
           this.rarityObj = response.data.reduce((acc, curr) => {
             if (curr.pity != 0) {
