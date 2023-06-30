@@ -89,20 +89,20 @@ class Gacha(APIView):
         game = get_object_or_404(Game, pk=game_id)
         rarities = game.rarity_set.all()
         for rarity in rarities:
-            self.raritylookup[rarity.rarity_name] = rarity
-            self.choices.append(rarity.rarity_name)
+            self.raritylookup[rarity.id] = rarity
+            self.choices.append(rarity.id)
             self.weights.append(rarity.chance)
             if rarity.pity != 0:
-                self.pity[rarity.rarity_name] = rarity.pity
+                self.pity[rarity.id] = rarity.pity
                 if rarity.softpity != 0:
-                    self.softpity[rarity.rarity_name] = rarity.softpity
-                    self.softpitychance[rarity.rarity_name] = rarity.softpitychance
+                    self.softpity[rarity.id] = rarity.softpity
+                    self.softpitychance[rarity.id] = rarity.softpitychance
             items = rarity.item_set.all()
-            self.itemChanceLookup[rarity.rarity_name] = {"itemname": [], "chance": []}
+            self.itemChanceLookup[rarity.id] = {"itemname": [], "chance": []}
             for item in items:
                 self.itemLookup[item.item_name] = item
-                self.itemChanceLookup[rarity.rarity_name]["itemname"].append(item.item_name)
-                self.itemChanceLookup[rarity.rarity_name]["chance"].append(item.chance)
+                self.itemChanceLookup[rarity.id]["itemname"].append(item.item_name)
+                self.itemChanceLookup[rarity.id]["chance"].append(item.chance)
         self.currpity = self.pity.copy()
         for key in self.currpity:
             self.currpity[key] = 0
