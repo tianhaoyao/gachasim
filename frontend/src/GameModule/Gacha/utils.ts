@@ -7,7 +7,6 @@ export const getColor = ({
   softPity?: number;
   color?: string;
 }) => {
-  console.log('pityCount', pityCount);
   if (!softPity) return color;
   if (pityCount > softPity && softPity != 0) {
     return '#FF0000';

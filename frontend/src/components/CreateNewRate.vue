@@ -1,45 +1,3 @@
-<template>
-  <router-link to="/home" class="button">DONE</router-link>
-  <form @submit="submitForm">
-    <label for="game">Game:</label>
-    <select v-model="form.game">
-      <option v-for="game in games" :key="game.id" :value="game.id">{{ game.game_name }}</option>
-    </select>
-
-    <label for="rarity">Rarity:</label>
-    <input type="text" id="rarity" v-model="form.rarity" />
-
-    <label for="chance">Chance:</label>
-    <input type="text" id="chance" v-model="form.chance" />
-
-    <label for="pity">Include Pity:</label>
-    <input type="checkbox" id="pity" v-model="includePity" />
-
-    <div v-if="includePity">
-      <label for="pityValue">Pity:</label>
-      <input type="text" id="pityValue" v-model="form.pity" />
-
-      <label for="includeSoftPity">Include Soft Pity:</label>
-      <input type="checkbox" id="includeSoftPity" v-model="includeSoftPity" />
-    </div>
-
-    <div v-if="includeSoftPity">
-      <label for="softPity">Soft Pity:</label>
-      <input type="text" id="softPityChance" v-model="form.softpity" />
-
-      <label for="softPityChance">Soft Pity Chance:</label>
-      <input type="text" id="softPityChance" v-model="form.softpitychance" />
-    </div>
-
-    <label for="color">Color:</label>
-    <color-input id="color" v-model="form.color" />
-
-    rate:{{ form.rarity }} chance{{ form.chance }} game: {{ form.game }} softpity:
-    {{ form.softpity }} softpitychance: {{ form.softpitychance }} color: {{ form.color }}
-    <button type="submit">Submit</button>
-  </form>
-</template>
-
 <script>
 import axios from 'axios';
 
@@ -118,5 +76,47 @@ export default {
   },
 };
 </script>
+
+<template>
+  <router-link to="/home" class="button">DONE</router-link>
+  <form @submit="submitForm">
+    <label for="game">Game:</label>
+    <select v-model="form.game">
+      <option v-for="game in games" :key="game.id" :value="game.id">{{ game.game_name }}</option>
+    </select>
+
+    <label for="rarity">Rarity:</label>
+    <input type="text" id="rarity" v-model="form.rarity" />
+
+    <label for="chance">Chance:</label>
+    <input type="text" id="chance" v-model="form.chance" />
+
+    <label for="pity">Include Pity:</label>
+    <input type="checkbox" id="pity" v-model="includePity" />
+
+    <div v-if="includePity">
+      <label for="pityValue">Pity:</label>
+      <input type="text" id="pityValue" v-model="form.pity" />
+
+      <label for="includeSoftPity">Include Soft Pity:</label>
+      <input type="checkbox" id="includeSoftPity" v-model="includeSoftPity" />
+    </div>
+
+    <div v-if="includeSoftPity">
+      <label for="softPity">Soft Pity:</label>
+      <input type="text" id="softPityChance" v-model="form.softpity" />
+
+      <label for="softPityChance">Soft Pity Chance:</label>
+      <input type="text" id="softPityChance" v-model="form.softpitychance" />
+    </div>
+
+    <label for="color">Color:</label>
+    <color-input id="color" v-model="form.color" />
+
+    rate:{{ form.rarity }} chance{{ form.chance }} game: {{ form.game }} softpity:
+    {{ form.softpity }} softpitychance: {{ form.softpitychance }} color: {{ form.color }}
+    <button type="submit">Submit</button>
+  </form>
+</template>
 
 <style></style>
