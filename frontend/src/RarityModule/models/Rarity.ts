@@ -1,4 +1,4 @@
-import { GameId } from './Game';
+import { GameId } from '@GameModule/models/Game';
 
 export type RarityId = number;
 

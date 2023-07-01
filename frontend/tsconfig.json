@@ -15,7 +15,11 @@
     "sourceMap": true,
     "baseUrl": ".",
     "types": ["webpack-env", "node", "@types/node"],
+    /** Make sure to also update the alias in vue.config.js */
     "paths": {
+      "@GameModule/*": ["src/GameModule/*"],
+      "@ItemModule/*": ["src/ItemModule/*"],
+      "@RarityModule*": ["src/RarityModule/*"],
       "@/*": ["src/*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]

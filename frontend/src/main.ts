@@ -5,7 +5,7 @@ import CreateNew from './components/CreateNew.vue';
 import CreateNewItem from './components/CreateNewItem.vue';
 import CreateNewRate from './components/CreateNewRate.vue';
 import CreateNewGame from './components/CreateNewGame.vue';
-import GameSelection from './components/GameSelection.vue';
+import GameView from '@GameModule/Gacha/components/GameView.vue';
 import axios from 'axios';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -17,7 +17,7 @@ const router = createRouter({
   routes: [
     // Define your routes here
     { path: '', redirect: '/home' },
-    { path: '/home', component: GameSelection },
+    { path: '/home', component: GameView },
     { path: '/create', component: CreateNew },
     { path: '/create/item', component: CreateNewItem },
     { path: '/create/game', component: CreateNewGame },

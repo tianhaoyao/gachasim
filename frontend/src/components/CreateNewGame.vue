@@ -1,16 +1,3 @@
-<template>
-  <router-link to="/home" class="button">DONE</router-link>
-  <form @submit="submitForm">
-    <label for="gameName">Game Name:</label>
-    <input type="text" id="gameName" v-model="gameName" />
-
-    <label for="image">Image:</label>
-    <input type="file" id="image" @change="handleImageChange" required />
-
-    <button type="submit">Submit</button>
-  </form>
-</template>
-
 <script>
 import axios from 'axios';
 
@@ -50,5 +37,18 @@ export default {
   },
 };
 </script>
+
+<template>
+  <router-link to="/home" class="button">DONE</router-link>
+  <form @submit="submitForm">
+    <label for="gameName">Game Name:</label>
+    <input type="text" id="gameName" v-model="gameName" />
+
+    <label for="image">Image:</label>
+    <input type="file" id="image" @change="handleImageChange" required />
+
+    <button type="submit">Submit</button>
+  </form>
+</template>
 
 <style></style>

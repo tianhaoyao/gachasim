@@ -1,32 +1,3 @@
-<template>
-  <router-link to="/home" class="button">DONE</router-link>
-  <form @submit="submitForm">
-    <label for="game">Game:</label>
-    <select v-model="gameid" @change="loadRates">
-      {{
-        rates
-      }}
-      <option v-for="game in games" :key="game.id" :value="game.id">{{ game.game_name }}</option>
-    </select>
-
-    <label for="rate">Rate:</label>
-    <select v-model="rate">
-      <option v-for="rate in rates" :key="rate.id" :value="rate.id">{{ rate.rarity }}</option>
-    </select>
-
-    <label for="item_name">Item Name:</label>
-    <input type="text" id="item_name" v-model="itemName" required />
-
-    <label for="image">Image:</label>
-    <input type="file" id="image" @change="handleImageChange" required />
-
-    <label for="chance">Chance:</label>
-    <input type="float" id="chance" v-model="chance" required />
-    rate:{{ rate }} itename:{{ itemName }} image: {{ image }} chance{{ chance }}
-    <button type="submit">Submit</button>
-  </form>
-</template>
-
 <script>
 import axios from 'axios';
 
@@ -104,5 +75,34 @@ export default {
   },
 };
 </script>
+
+<template>
+  <router-link to="/home" class="button">DONE</router-link>
+  <form @submit="submitForm">
+    <label for="game">Game:</label>
+    <select v-model="gameid" @change="loadRates">
+      {{
+        rates
+      }}
+      <option v-for="game in games" :key="game.id" :value="game.id">{{ game.game_name }}</option>
+    </select>
+
+    <label for="rate">Rate:</label>
+    <select v-model="rate">
+      <option v-for="rate in rates" :key="rate.id" :value="rate.id">{{ rate.rarity }}</option>
+    </select>
+
+    <label for="item_name">Item Name:</label>
+    <input type="text" id="item_name" v-model="itemName" required />
+
+    <label for="image">Image:</label>
+    <input type="file" id="image" @change="handleImageChange" required />
+
+    <label for="chance">Chance:</label>
+    <input type="float" id="chance" v-model="chance" required />
+    rate:{{ rate }} itename:{{ itemName }} image: {{ image }} chance{{ chance }}
+    <button type="submit">Submit</button>
+  </form>
+</template>
 
 <style></style>
