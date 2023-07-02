@@ -1,4 +1,4 @@
-import { RarityId } from '@RarityModulemodels/Rarity';
+import { RarityId } from '@RarityModule/models/Rarity';
 
 export type ItemId = number;
 

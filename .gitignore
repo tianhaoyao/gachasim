@@ -5,6 +5,14 @@ __pycache__/
 
 *.pyc
 
+node_modules
+
+# local images
+game/uploads
+
+# local db file
+db.sqlite3
+
 output*
 
 # C extensions
