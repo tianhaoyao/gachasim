@@ -3,6 +3,7 @@
     "target": "esnext",
     "module": "esnext",
     "strict": true,
+    "noImplicitThis": true,
     "jsx": "preserve",
     "moduleResolution": "node",
     "noImplicitAny": false,
@@ -19,7 +20,7 @@
     "paths": {
       "@GameModule/*": ["src/GameModule/*"],
       "@ItemModule/*": ["src/ItemModule/*"],
-      "@RarityModule*": ["src/RarityModule/*"],
+      "@RarityModule/*": ["src/RarityModule/*"],
       "@/*": ["src/*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
