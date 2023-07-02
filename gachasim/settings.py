@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     'colorfield',
     'django_filters',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
+    'knox',
 ]
 
 MIDDLEWARE = [
@@ -78,6 +80,9 @@ TEMPLATES = [
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
 }
 
 WSGI_APPLICATION = 'gachasim.wsgi.application'

@@ -1,19 +1,14 @@
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
-from django.contrib.auth.models import User, Group
-from django.urls import reverse
-from django.views import generic
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.renderers import JSONRenderer
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
-import django_filters
 from rest_framework import filters, viewsets
-from rest_framework import permissions
-from django.core import serializers
 from .serializer import RaritySerializer, ItemSerializer, GameSerializer
 from .models import Game, Rarity, Item
 import random
+
 
 class ItemViewSet(viewsets.ModelViewSet):
     """
@@ -25,6 +20,13 @@ class ItemViewSet(viewsets.ModelViewSet):
     ordering_fields = ['rarity_id', 'id']
     filterset_fields = ['rarity_id']
 
+    def get_permissions(self):
+        if self.action == 'create':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]
+
     def list(self, request, *args, **kwargs):
         id = request.query_params.get('id')
         if id is not None:
@@ -33,6 +35,7 @@ class ItemViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
 
         return super().list(request, *args, **kwargs)
+
 
 class RarityViewSet(viewsets.ModelViewSet):
     """
@@ -44,6 +47,13 @@ class RarityViewSet(viewsets.ModelViewSet):
     ordering_fields = ['game_id', 'id']
     filterset_fields = ['game_id']
 
+    def get_permissions(self):
+        if self.action == 'create':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]
+
     def list(self, request, *args, **kwargs):
         id = request.query_params.get('id')
         if id is not None:
@@ -52,7 +62,7 @@ class RarityViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
 
         return super().list(request, *args, **kwargs)
-    
+
 
 class GameViewSet(viewsets.ModelViewSet):
     """
@@ -62,7 +72,14 @@ class GameViewSet(viewsets.ModelViewSet):
     serializer_class = GameSerializer
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['id']
-    
+
+    def get_permissions(self):
+        if self.action == 'create':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]
+
     def list(self, request, *args, **kwargs):
         id = request.query_params.get('id')
         if id is not None:
@@ -71,7 +88,7 @@ class GameViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
 
         return super().list(request, *args, **kwargs)
-    
+
 
 class Gacha(APIView):
     populated = False
@@ -101,7 +118,8 @@ class Gacha(APIView):
             self.itemChanceLookup[rarity.id] = {"itemname": [], "chance": []}
             for item in items:
                 self.itemLookup[item.item_name] = item
-                self.itemChanceLookup[rarity.id]["itemname"].append(item.item_name)
+                self.itemChanceLookup[rarity.id]["itemname"].append(
+                    item.item_name)
                 self.itemChanceLookup[rarity.id]["chance"].append(item.chance)
         self.currpity = self.pity.copy()
         for key in self.currpity:
@@ -109,26 +127,26 @@ class Gacha(APIView):
         self.populated = True
 
     # give us an updated pity, return what roll we got
-    def roll(self): 
+    def roll(self):
         atPity = None
         # check pity
         for key in self.currpity:
             if self.currpity[key] == self.pity[key] - 1:
                 atPity = key
                 break
-        
+
         # check if we are at pity
         if atPity:
             self.tickPity()
             self.currpity[key] = 0
             return atPity
-    
+
         atSoftPity = None
         for key in self.softpity:
             if self.currpity[key] >= self.softpity[key]:
                 atSoftPity = key
                 break
-        
+
         # check if we are at pity
         if atSoftPity:
             self.tickPity()
@@ -152,16 +170,17 @@ class Gacha(APIView):
         if roll in self.currpity:
             self.currpity[roll] = 0
         return roll
-        
+
     def tickPity(self):
         for key in self.currpity:
             self.currpity[key] += 1
 
     def get_item(self, rarity):
-        item_names, item_chances = self.itemChanceLookup[rarity]["itemname"], self.itemChanceLookup[rarity]["chance"]
+        item_names, item_chances = self.itemChanceLookup[rarity][
+            "itemname"], self.itemChanceLookup[rarity]["chance"]
         roll = random.choices(item_names, item_chances)[0]
         return self.itemLookup[roll]
-    
+
     def get(self, request, game_id):
         if not self.populated:
             self.populate(game_id)
@@ -171,8 +190,7 @@ class Gacha(APIView):
             rarity = self.roll()
             roll = RaritySerializer(self.raritylookup[rarity]).data
             item = ItemSerializer(self.get_item(rarity)).data
-            print(self.currpity)
-            res.append({"rarity": roll, "item": item, "pity": self.currpity.copy()})
-        
+            res.append({"rarity": roll, "item": item,
+                       "pity": self.currpity.copy()})
+
         return Response(res)
-    
