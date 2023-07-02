@@ -14,6 +14,6 @@ export const router = createRouter({
     { path: '/create', component: CreateNew },
     { path: '/create/item', component: CreateNewItem },
     { path: '/create/game', component: CreateNewGame },
-    { path: '/create/rate', component: CreateNewRarity },
+    { path: '/create/rarity', component: CreateNewRarity },
   ],
 });
