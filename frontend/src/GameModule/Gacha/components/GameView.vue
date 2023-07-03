@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, inject, provide, reactive } from 'vue';
 import GachaResult from './GachaResult.vue';
-import axios from 'axios';
+import axios from '@/axios-instance';
 import { Game } from '@GameModule/models/Game';
 import { SelectedGameKey } from '@/symbols';
 import { RaritiesHashKey } from '../symbols';
@@ -68,7 +68,7 @@ export default defineComponent({
         return;
       }
       axios
-        .get(`/game/rarities/`, { params: { game: this.selectedGame.id } })
+        .get(`/game/rarities/`, { params: { game_id: this.selectedGame.id } })
         .then((response) => {
           const raritiesHash = response.data.reduce((acc, curr) => {
             if (curr.pity != 0) {

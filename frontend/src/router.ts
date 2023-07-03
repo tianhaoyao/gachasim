@@ -4,6 +4,7 @@ import CreateNewItem from '@ItemModule/CreateNewItem/components/CreateNewItem.vu
 import CreateNewRarity from '@RarityModule/CreateNewRarity/components/CreateNewRarity.vue';
 import CreateNewGame from '@GameModule/CreateNewGame/components/CreateNewGame.vue';
 import GameView from '@GameModule/Gacha/components/GameView.vue';
+import UserAuth from './components/UserAuth.vue';
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -15,5 +16,6 @@ export const router = createRouter({
     { path: '/create/item', component: CreateNewItem },
     { path: '/create/game', component: CreateNewGame },
     { path: '/create/rarity', component: CreateNewRarity },
+    { path: '/login', component: UserAuth },
   ],
 });

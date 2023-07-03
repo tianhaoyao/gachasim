@@ -27,6 +27,7 @@ SECRET_KEY = 'django-insecure-#f8p9z04x$!h7%2da@^5_$x@s08&oz-_@p12g*7uh#kpv%wk!p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# TODO: change this to not allow all
 ALLOWED_HOSTS=['*']
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -44,7 +45,9 @@ INSTALLED_APPS = [
     'colorfield',
     'django_filters',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
+    'knox',
 ]
 
 MIDDLEWARE = [
@@ -78,6 +81,9 @@ TEMPLATES = [
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
 }
 
 WSGI_APPLICATION = 'gachasim.wsgi.application'

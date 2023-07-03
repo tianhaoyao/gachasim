@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Game } from '@GameModule/models/Game';
-import axios from 'axios';
+import axios from '@/axios-instance';
 import { defineComponent } from 'vue';
 import keyBy from 'lodash/keyBy';
 

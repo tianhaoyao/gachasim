@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Game } from '@GameModule/models/Game';
 import { Rarity, RarityId } from '@RarityModule/models/Rarity';
-import axios from 'axios';
+import axios from '@/axios-instance';
 import { defineComponent } from 'vue';
 import keyBy from 'lodash/keyBy';
 
@@ -58,7 +58,7 @@ export default defineComponent({
         return;
 
       const formData = new FormData();
-      formData.append('rate', this.form.rarityId.toString());
+      formData.append('rarity_id', this.form.rarityId.toString());
       formData.append('item_name', this.form.itemName);
       formData.append('image', this.form.selectedImage);
       formData.append('chance', Number(this.form.chance).toString());
