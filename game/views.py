@@ -92,6 +92,7 @@ class GameViewSet(viewsets.ModelViewSet):
 
 class Gacha(APIView):
     populated = False
+    game = -1
     pity = dict()
     choices = []
     weights = []
@@ -102,10 +103,27 @@ class Gacha(APIView):
     itemLookup = dict()
     itemChanceLookup = dict()
 
+    def reset(self):
+        self.populated = False
+        self.pity = dict()
+        self.choices = []
+        self.weights = []
+        self.currpity = dict()
+        self.raritylookup = dict()
+        self.softpity = dict()
+        self.softpitychance = dict()
+        self.itemLookup = dict()
+        self.itemChanceLookup = dict()
+
     def populate(self, game_id):
         game = get_object_or_404(Game, pk=game_id)
+        if game_id != self.game:
+            self.reset()
+            self.game = game_id
         rarities = game.rarity_set.all()
+
         for rarity in rarities:
+            print(rarity.id)
             self.raritylookup[rarity.id] = rarity
             self.choices.append(rarity.id)
             self.weights.append(rarity.chance)
@@ -124,7 +142,7 @@ class Gacha(APIView):
         self.currpity = self.pity.copy()
         for key in self.currpity:
             self.currpity[key] = 0
-        self.populated = True
+        self.populated = False
 
     # give us an updated pity, return what roll we got
     def roll(self):
@@ -184,6 +202,9 @@ class Gacha(APIView):
     def get(self, request, game_id):
         if not self.populated:
             self.populate(game_id)
+        # if one of the data structures not populated, cannot roll.
+        if not self.raritylookup or not self.itemLookup:
+            return Response([])
         numrolls = int(request.GET.get('numrolls', ''))
         res = []
         for i in range(numrolls):
