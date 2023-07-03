@@ -97,7 +97,7 @@ class Gacha(APIView):
     choices = []
     weights = []
     currpity = dict()
-    raritylookup = dict()
+    rarityByIdHash = dict()
     softpity = dict()
     softpitychance = dict()
     itemLookup = dict()
@@ -109,7 +109,7 @@ class Gacha(APIView):
         self.choices = []
         self.weights = []
         self.currpity = dict()
-        self.raritylookup = dict()
+        self.rarityByIdHash = dict()
         self.softpity = dict()
         self.softpitychance = dict()
         self.itemLookup = dict()
@@ -123,7 +123,7 @@ class Gacha(APIView):
         rarities = game.rarity_set.all()
 
         for rarity in rarities:
-            self.raritylookup[rarity.id] = rarity
+            self.rarityByIdHash[rarity.id] = rarity
             self.choices.append(rarity.id)
             self.weights.append(rarity.chance)
             if rarity.pity != 0:
@@ -202,15 +202,15 @@ class Gacha(APIView):
         if not self.populated:
             self.populate(game_id)
         # if one of the data structures not populated, cannot roll.
-        if not self.raritylookup or not self.itemLookup:
+        if not self.rarityByIdHash or not self.itemLookup:
             return Response([])
         numrolls = int(request.GET.get('numrolls', ''))
         res = []
         for i in range(numrolls):
-            rarity = self.roll()
-            roll = RaritySerializer(self.raritylookup[rarity]).data
-            item = ItemSerializer(self.get_item(rarity)).data
-            res.append({"rarity": roll, "item": item,
+            rarity_id = self.roll()
+            rarity = RaritySerializer(self.rarityByIdHash[rarity_id]).data
+            item = ItemSerializer(self.get_item(rarity_id)).data
+            res.append({"rarity": rarity, "item": item,
                        "pity": self.currpity.copy()})
 
         return Response(res)
