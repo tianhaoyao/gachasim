@@ -9,6 +9,7 @@ module.exports = defineConfig({
         '@GameModule': path.resolve(__dirname, 'src/GameModule'),
         '@RarityModule': path.resolve(__dirname, 'src/RarityModule'),
         '@ItemModule': path.resolve(__dirname, 'src/ItemModule'),
+        '@UserModule': path.resolve(__dirname, 'src/UserModule'),
         '@': path.resolve(__dirname, 'src'),
       },
       extensions: ['.js', '.ts', '.vue', '.json'],

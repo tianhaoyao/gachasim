@@ -61,6 +61,11 @@ export default defineComponent({
           <a class="nav-link"> Login </a>
         </router-link>
       </li>
+      <li class="nav-item">
+        <router-link to="/register">
+          <a class="nav-link"> Register </a>
+        </router-link>
+      </li>
     </ul>
   </nav>
 </template>

@@ -1,16 +1,8 @@
-<template>
-  <div>
-    <input v-model="username" placeholder="Username" />
-    <input v-model="password" placeholder="Password" type="password" />
-    <button @click="login">Login</button>
-  </div>
-</template>
-
 <script>
 import axios from 'axios';
 
 export default {
-  name: 'UserAuth',
+  name: 'LoginPage',
   data() {
     return {
       username: '',
@@ -41,3 +33,11 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div>
+    <input v-model="username" placeholder="Username" />
+    <input v-model="password" placeholder="Password" type="password" />
+    <button @click="login">Login</button>
+  </div>
+</template>

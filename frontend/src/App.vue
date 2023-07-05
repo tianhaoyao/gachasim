@@ -4,6 +4,8 @@ import { Game } from '@GameModule/models/Game';
 import { SelectedGameKey, SetSelectedGameKey } from './symbols';
 import NavBar from './components/NavBar.vue';
 import { useRouter, useRoute } from 'vue-router';
+import { ThemeProvider } from 'vue3-styled-components';
+import { theme } from './theme';
 
 type AppState = {
   selectedGame?: Game;
@@ -13,6 +15,7 @@ export default defineComponent({
   name: 'App',
   components: {
     NavBar,
+    ThemeProvider,
   },
   setup() {
     const state = reactive<AppState>({
@@ -37,13 +40,17 @@ export default defineComponent({
 
     provide(SelectedGameKey, selectedGame);
     provide(SetSelectedGameKey, setSelectedGame);
+
+    return { theme };
   },
 });
 </script>
 
 <template>
-  <NavBar />
-  <RouterView />
+  <ThemeProvider :theme="theme">
+    <NavBar />
+    <RouterView />
+  </ThemeProvider>
 </template>
 
 <style>
