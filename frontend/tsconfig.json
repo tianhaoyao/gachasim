@@ -21,6 +21,7 @@
       "@GameModule/*": ["src/GameModule/*"],
       "@ItemModule/*": ["src/ItemModule/*"],
       "@RarityModule/*": ["src/RarityModule/*"],
+      "@UserModule/*": ["src/UserModule/*"],
       "@/*": ["src/*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
