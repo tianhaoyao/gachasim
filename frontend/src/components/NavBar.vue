@@ -1,5 +1,5 @@
 <script lang="ts">
-import { SetSelectedGameKey } from '@/symbols';
+import { SetSelectedGameKey, LoggedInUserKey } from '@/symbols';
 import { Game } from '@GameModule/models/Game';
 import axios from 'axios';
 import { defineComponent, inject } from 'vue';
@@ -12,9 +12,11 @@ export default defineComponent({
   name: 'NavBar',
   setup() {
     const setSelectedGame = inject(SetSelectedGameKey);
+    const loggedInUser = inject(LoggedInUserKey);
 
     return {
       setSelectedGame,
+      loggedInUser,
     };
   },
   data(): NavBarData {
@@ -56,12 +58,17 @@ export default defineComponent({
           <a class="nav-link"> Create New </a>
         </router-link>
       </li>
-      <li class="nav-item">
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li v-if="loggedInUser" class="nav-item">
+        <span class="navbar-text"> Logged in as {{ loggedInUser.username }} </span>
+      </li>
+      <li v-if="!loggedInUser" class="nav-item">
         <router-link to="/login">
           <a class="nav-link"> Login </a>
         </router-link>
       </li>
-      <li class="nav-item">
+      <li v-if="!loggedInUser" class="nav-item">
         <router-link to="/register">
           <a class="nav-link"> Register </a>
         </router-link>

@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, inject } from 'vue';
+import { LoggedInUserKey } from '@/symbols';
 import axios from '@/axios-instance';
 
 type ComponentData = {
@@ -11,6 +12,13 @@ type ComponentData = {
 
 export default defineComponent({
   name: 'CreateNewGame',
+  setup() {
+    const loggedInUser = inject(LoggedInUserKey);
+
+    return {
+      loggedInUser,
+    };
+  },
   data(): ComponentData {
     return {
       form: {
@@ -21,13 +29,18 @@ export default defineComponent({
   },
   methods: {
     onSubmit() {
-      if (this.form.gameName === null || this.form.selectedImage === null) {
+      if (
+        this.form.gameName === null ||
+        this.form.selectedImage === null ||
+        this.loggedInUser === null
+      ) {
         return;
       }
 
       const formData = new FormData();
       formData.append('game_name', this.form.gameName);
       formData.append('image', this.form.selectedImage);
+      formData.append('author_id', String(this.loggedInUser?.id));
 
       axios
         .post('/game/games/', formData)

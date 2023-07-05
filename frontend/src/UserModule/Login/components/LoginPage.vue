@@ -1,8 +1,19 @@
 <script>
-import axios from 'axios';
+import { SetLoggedInUserKey, LoggedInUserKey } from '@/symbols';
+import axios from '@/axios-instance';
+import { inject } from 'vue';
 
 export default {
   name: 'LoginPage',
+  setup() {
+    const setLoggedInUser = inject(SetLoggedInUserKey);
+    const loggedInUser = inject(LoggedInUserKey);
+
+    return {
+      setLoggedInUser,
+      loggedInUser,
+    };
+  },
   data() {
     return {
       username: '',
@@ -20,13 +31,20 @@ export default {
           // Save the access token in local storage or Vuex store
           const accessToken = response.data.access;
           localStorage.setItem('accessToken', accessToken);
-          console.log('authorized');
-          console.log(accessToken);
-          // Redirect or perform other actions after successful login
-          // ...
+          this.getUserInfo();
         })
         .catch((error) => {
-          // Handle login error
+          console.error(error);
+        });
+    },
+    getUserInfo() {
+      axios
+        .get('/auth/user-details/')
+        .then((response) => {
+          // Save the access token in local storage or Vuex store
+          this.setLoggedInUser(response.data);
+        })
+        .catch((error) => {
           console.error(error);
         });
     },
