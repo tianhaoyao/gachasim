@@ -53,7 +53,7 @@ export default defineComponent({
 
     const setLoggedInUser = (user: User) => {
       state.loggedInUser = user;
-      // redirect user back to home whenever selecting a new game if not on home
+      // redirect user back to home whenever logging in
       if (path.value !== '/home') {
         router.push('/home');
       }
