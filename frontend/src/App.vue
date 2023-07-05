@@ -1,7 +1,13 @@
 <script lang="ts">
 import { computed, defineComponent, provide, reactive } from 'vue';
 import { Game } from '@GameModule/models/Game';
-import { SelectedGameKey, SetSelectedGameKey } from './symbols';
+import { User } from '@UserModule/models/User';
+import {
+  SelectedGameKey,
+  SetSelectedGameKey,
+  LoggedInUserKey,
+  SetLoggedInUserKey,
+} from '@/symbols';
 import NavBar from './components/NavBar.vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ThemeProvider } from 'vue3-styled-components';
@@ -9,6 +15,7 @@ import { theme } from './theme';
 
 type AppState = {
   selectedGame?: Game;
+  loggedInUser?: User;
 };
 
 export default defineComponent({
@@ -20,6 +27,7 @@ export default defineComponent({
   setup() {
     const state = reactive<AppState>({
       selectedGame: undefined,
+      loggedInUser: undefined,
     });
 
     const router = useRouter();
@@ -40,6 +48,19 @@ export default defineComponent({
 
     provide(SelectedGameKey, selectedGame);
     provide(SetSelectedGameKey, setSelectedGame);
+
+    const loggedInUser = computed(() => state.loggedInUser);
+
+    const setLoggedInUser = (user: User) => {
+      state.loggedInUser = user;
+      // redirect user back to home whenever logging in
+      if (path.value !== '/home') {
+        router.push('/home');
+      }
+    };
+
+    provide(LoggedInUserKey, loggedInUser);
+    provide(SetLoggedInUserKey, setLoggedInUser);
 
     return { theme };
   },

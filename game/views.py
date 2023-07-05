@@ -102,6 +102,7 @@ class Gacha(APIView):
     softpitychance = dict()
     itemLookup = dict()
     itemChanceLookup = dict()
+    permission_classes = [AllowAny]
 
     def reset(self):
         self.populated = False
