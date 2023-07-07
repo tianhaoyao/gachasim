@@ -7,6 +7,7 @@ import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.js';
 import ColorInput from 'vue-color-input';
+import VueCookies from 'vue-cookies';
 
 axios.defaults.baseURL = 'http://127.0.0.1:8000/';
 
@@ -20,5 +21,6 @@ const app = createApp(App);
 
 app.use(router);
 app.use(pinia); // make sure this line is the one right above app.mount() for pinia to work properly in devtools
+app.use(VueCookies);
 app.mount('#app');
 app.component('ColorInput', ColorInput);

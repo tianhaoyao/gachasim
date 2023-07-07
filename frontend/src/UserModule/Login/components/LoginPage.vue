@@ -19,9 +19,16 @@ export default {
           password: this.password,
         })
         .then((response) => {
-          // Save the access token in local storage or Vuex store
+          // Save the access token in cookie
           const accessToken = response.data.access;
-          localStorage.setItem('accessToken', accessToken);
+          const refreshToken = response.data.refresh;
+
+          // save another cookie, expiration, set to 5 minutes so we can
+          // refresh the token
+          const expires = new Date(Date.now() + 300 * 1000);
+          this.$cookies.set('token', accessToken);
+          this.$cookies.set('refresh', refreshToken);
+          this.$cookies.set('expiration', expires.toUTCString());
           this.getUserInfo();
         })
         .catch((error) => {

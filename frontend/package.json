@@ -16,6 +16,7 @@
     "pinia": "^2.1.4",
     "vue": "^3.3.4",
     "vue-color-input": "^1.0.8",
+    "vue-cookies": "^1.8.3",
     "vue-router": "^4.2.2",
     "vue3-styled-components": "^1.2.1",
     "yarn": "^1.22.19"
