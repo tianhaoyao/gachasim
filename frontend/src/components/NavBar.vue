@@ -1,8 +1,10 @@
 <script lang="ts">
-import { SetSelectedGameKey, LoggedInUserKey } from '@/symbols';
 import { Game } from '@GameModule/models/Game';
 import axios from 'axios';
-import { defineComponent, inject } from 'vue';
+import { mapState, mapActions } from 'pinia';
+import { defineComponent } from 'vue';
+import { useUserStore } from '@UserModule/stores/UserStore';
+import { useGameStore } from '@GameModule/stores/GameStore';
 
 type NavBarData = {
   games: Array<Game>;
@@ -10,24 +12,19 @@ type NavBarData = {
 
 export default defineComponent({
   name: 'NavBar',
-  setup() {
-    const setSelectedGame = inject(SetSelectedGameKey);
-    const loggedInUser = inject(LoggedInUserKey);
-
-    return {
-      setSelectedGame,
-      loggedInUser,
-    };
-  },
   data(): NavBarData {
     return {
       games: [],
     };
   },
+  computed: {
+    ...mapState(useUserStore, ['user']),
+  },
   mounted() {
     this.fetchGames();
   },
   methods: {
+    ...mapActions(useGameStore, ['setSelectedGame']),
     fetchGames: function () {
       axios
         .get(`/game/games/`)
@@ -51,7 +48,7 @@ export default defineComponent({
         </router-link>
       </li>
       <li v-for="game in games" :key="game.id" class="nav-item">
-        <a class="nav-link" href="#" @click="setSelectedGame?.(game)">{{ game.game_name }}</a>
+        <a class="nav-link" href="#" @click="setSelectedGame(game)">{{ game.game_name }}</a>
       </li>
       <li class="nav-item">
         <router-link to="/create">
@@ -60,15 +57,15 @@ export default defineComponent({
       </li>
     </ul>
     <ul class="navbar-nav ml-auto">
-      <li v-if="loggedInUser" class="nav-item">
-        <span class="navbar-text"> Logged in as {{ loggedInUser.username }} </span>
+      <li v-if="user" class="nav-item">
+        <span class="navbar-text"> Logged in as {{ user.username }} </span>
       </li>
-      <li v-if="!loggedInUser" class="nav-item">
+      <li v-if="!user" class="nav-item">
         <router-link to="/login">
           <a class="nav-link"> Login </a>
         </router-link>
       </li>
-      <li v-if="!loggedInUser" class="nav-item">
+      <li v-if="!user" class="nav-item">
         <router-link to="/register">
           <a class="nav-link"> Register </a>
         </router-link>

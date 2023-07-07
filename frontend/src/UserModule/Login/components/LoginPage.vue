@@ -1,19 +1,10 @@
 <script>
-import { SetLoggedInUserKey, LoggedInUserKey } from '@/symbols';
 import axios from '@/axios-instance';
-import { inject } from 'vue';
+import { useUserStore } from '@UserModule/stores/UserStore';
+import { mapActions } from 'pinia';
 
 export default {
   name: 'LoginPage',
-  setup() {
-    const setLoggedInUser = inject(SetLoggedInUserKey);
-    const loggedInUser = inject(LoggedInUserKey);
-
-    return {
-      setLoggedInUser,
-      loggedInUser,
-    };
-  },
   data() {
     return {
       username: '',
@@ -37,12 +28,13 @@ export default {
           console.error(error);
         });
     },
+    ...mapActions(useUserStore, ['setUser']),
     getUserInfo() {
       axios
         .get('/auth/user-details/')
         .then((response) => {
           // Save the access token in local storage or Vuex store
-          this.setLoggedInUser(response.data);
+          this.setUser(response.data);
         })
         .catch((error) => {
           console.error(error);
