@@ -1,7 +1,8 @@
 <script lang="ts">
-import { defineComponent, inject } from 'vue';
-import { LoggedInUserKey } from '@/symbols';
+import { defineComponent } from 'vue';
 import axios from '@/axios-instance';
+import { mapState } from 'pinia';
+import { useUserStore } from '@UserModule/stores/UserStore';
 
 type ComponentData = {
   form: {
@@ -12,13 +13,6 @@ type ComponentData = {
 
 export default defineComponent({
   name: 'CreateNewGame',
-  setup() {
-    const loggedInUser = inject(LoggedInUserKey);
-
-    return {
-      loggedInUser,
-    };
-  },
   data(): ComponentData {
     return {
       form: {
@@ -27,20 +21,19 @@ export default defineComponent({
       },
     };
   },
+  computed: {
+    ...mapState(useUserStore, ['user']),
+  },
   methods: {
     onSubmit() {
-      if (
-        this.form.gameName === null ||
-        this.form.selectedImage === null ||
-        this.loggedInUser === null
-      ) {
+      if (!this.form.gameName || !this.form.selectedImage || !this.user) {
         return;
       }
 
       const formData = new FormData();
       formData.append('game_name', this.form.gameName);
       formData.append('image', this.form.selectedImage);
-      formData.append('author_id', String(this.loggedInUser?.id));
+      formData.append('author_id', String(this.user.id));
 
       axios
         .post('/game/games/', formData)

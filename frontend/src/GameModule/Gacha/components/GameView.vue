@@ -3,9 +3,10 @@ import { defineComponent, inject, provide, reactive } from 'vue';
 import GachaResult from './GachaResult.vue';
 import axios from '@/axios-instance';
 import { Game } from '@GameModule/models/Game';
-import { SelectedGameKey } from '@/symbols';
 import { RaritiesHashKey } from '../symbols';
 import { RaritiesHash, Roll } from '../types';
+import { mapState } from 'pinia';
+import { useGameStore } from '@GameModule/stores/GameStore';
 
 type GameViewData = {
   rollResults: Array<Roll>;
@@ -19,8 +20,6 @@ export default defineComponent({
     GachaResult,
   },
   setup() {
-    const selectedGame = inject(SelectedGameKey);
-
     const raritiesHash = reactive<RaritiesHash>({});
 
     const setRaritiesHash = (res: RaritiesHash) => {
@@ -30,7 +29,6 @@ export default defineComponent({
     provide(RaritiesHashKey, raritiesHash);
 
     return {
-      selectedGame,
       setRaritiesHash,
     };
   },
@@ -39,6 +37,9 @@ export default defineComponent({
       rollResults: [],
       numRolls: 10,
     };
+  },
+  computed: {
+    ...mapState(useGameStore, ['selectedGame']),
   },
   watch: {
     selectedGame() {
