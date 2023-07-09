@@ -8,9 +8,6 @@ type Props = {
 
 defineOptions({
   name: 'GachaResult',
-  components: {
-    GachaResultCard,
-  },
 });
 
 defineProps<Props>();

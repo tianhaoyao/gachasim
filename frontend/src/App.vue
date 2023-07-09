@@ -5,10 +5,6 @@ import { theme } from './theme';
 
 defineOptions({
   name: 'App',
-  components: {
-    NavBar,
-    ThemeProvider,
-  },
 });
 </script>
 
