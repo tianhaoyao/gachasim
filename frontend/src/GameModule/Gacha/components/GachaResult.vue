@@ -13,13 +13,13 @@ defineOptions({
   },
 });
 
-const props = defineProps<Props>();
+defineProps<Props>();
 </script>
 
 <template>
   <div class="container">
     <div class="row row-cols-md-5 card-container">
-      <div v-for="(roll, index) in props.rollResults" :key="index" class="col">
+      <div v-for="(roll, index) in rollResults" :key="index" class="col">
         <GachaResultCard :roll="roll" />
       </div>
     </div>
