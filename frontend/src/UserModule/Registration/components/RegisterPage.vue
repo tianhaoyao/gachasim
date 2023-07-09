@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
-import axios from '@/axios-instance';
+import { callApi } from '@/callApi';
 import { RegisterPageContainer } from './styles';
 
 export default defineComponent({
@@ -20,21 +20,23 @@ export default defineComponent({
   methods: {
     onSubmit() {
       if (this.form.userName && this.form.password && this.form.email) {
-        const payload = {
-          username: this.form.userName,
-          password: this.form.password,
-          email: this.form.email,
+        const requestInit = {
+          method: 'POST',
+          body: JSON.stringify({
+            username: this.form.userName,
+            password: this.form.password,
+            email: this.form.email,
+          }),
         };
 
-        axios
-          .post('/auth/register/', payload)
+        callApi({
+          endpoint: '/auth/register/',
+          requestInit: requestInit,
+        })
           .then((response) => {
             console.log(response);
-            // Redirect or perform other actions after successful registration
-            // ...
           })
           .catch((error) => {
-            // Handle registration error
             console.error(error);
           });
       }

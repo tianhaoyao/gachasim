@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Game } from '@GameModule/models/Game';
-import axios from '@/axios-instance';
+import { callApi } from '@/callApi';
 import { onMounted, reactive, ref } from 'vue';
 import keyBy from 'lodash/keyBy';
 
@@ -69,12 +69,17 @@ const onSubmit = () => {
     color: form.color,
   };
 
-  axios
-    .post('/game/rarities/', payload)
+  const requestInit = {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  };
+
+  callApi({
+    endpoint: '/game/rarities/',
+    requestInit: requestInit,
+  })
     .then((response) => {
-      console.log(response.data);
-      // Handle success response
-      console.log(payload);
+      console.log(response);
     })
     .catch((error) => {
       console.error(error);
@@ -84,10 +89,11 @@ const onSubmit = () => {
 };
 
 const fetchGames = () => {
-  axios
-    .get('/game/games/')
+  callApi<Array<Game>>({
+    endpoint: '/game/games/',
+  })
     .then((response) => {
-      const fetchedGames = response.data;
+      const fetchedGames = response;
       games.value = fetchedGames;
       gamesHash.value = keyBy(fetchedGames, 'id');
     })

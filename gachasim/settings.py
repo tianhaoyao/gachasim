@@ -28,10 +28,15 @@ SECRET_KEY = 'django-insecure-#f8p9z04x$!h7%2da@^5_$x@s08&oz-_@p12g*7uh#kpv%wk!p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# TODO: change this to not allow all
-ALLOWED_HOSTS=['*']
-CORS_ORIGIN_ALLOW_ALL = True
-
+CORS_ORIGIN_ALLOW_ALL = False
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+]
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:8080',
+]
 
 # Application definition
 
@@ -52,6 +57,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -59,7 +65,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'gachasim.urls'

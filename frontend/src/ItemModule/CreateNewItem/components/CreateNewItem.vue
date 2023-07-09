@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Game, GameId } from '@GameModule/models/Game';
 import { Rarity, RarityId } from '@RarityModule/models/Rarity';
-import axios from '@/axios-instance';
+import { callApi } from '@/callApi';
 import { onMounted, reactive, ref } from 'vue';
 import keyBy from 'lodash/keyBy';
 
@@ -42,10 +42,11 @@ onMounted(() => {
 });
 
 const fetchGames = () => {
-  axios
-    .get('/game/games/')
+  callApi<Array<Game>>({
+    endpoint: '/game/games/',
+  })
     .then((response) => {
-      games.value = response.data;
+      games.value = response;
     })
     .catch((error) => {});
 };
@@ -53,10 +54,12 @@ const fetchGames = () => {
 const fetchRarities = () => {
   if (form.gameId === null) return;
 
-  axios
-    .get(`/game/rarities/`, { params: { game_id: form.gameId } })
+  callApi<Array<Rarity>>({
+    endpoint: `/game/rarities/`,
+    params: { game_id: form.gameId },
+  })
     .then((response) => {
-      const fetchedRarities = response.data;
+      const fetchedRarities = response;
       rarities.value = fetchedRarities;
       raritiesHash.value = keyBy(fetchedRarities, 'id');
     })
@@ -77,12 +80,15 @@ const onSubmit = () => {
 
   Object.assign(form, initialForm);
 
-  axios
-    .post('/game/items/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
+  const requestInit = {
+    method: 'POST',
+    body: formData,
+  };
+
+  callApi({
+    endpoint: '/game/items/',
+    requestInit: requestInit,
+  })
     .then((response) => {})
     .catch((error) => {});
 };

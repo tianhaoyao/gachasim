@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
-import axios from '@/axios-instance';
+import { callApi } from '@/callApi';
 import { useUserStore } from '@UserModule/stores/UserStore';
 import { storeToRefs } from 'pinia';
 
@@ -37,8 +37,15 @@ const onCreateNewGame = () => {
 
   Object.assign(form, initialForm);
 
-  axios
-    .post('/game/games/', formData)
+  const requestInit = {
+    method: 'POST',
+    body: formData,
+  };
+
+  callApi({
+    endpoint: '/game/games/',
+    requestInit: requestInit,
+  })
     .then((response) => {})
     .catch((error) => {
       console.error(error);
@@ -58,7 +65,7 @@ const onChangeImageFile = (event: Event) => {
 
 <template>
   <router-link to="/home" class="button">DONE</router-link>
-  <form @submit.prevent="onCreateNewGame">
+  <form @submit.prevent="onCreateNewGame" enctype="multipart/form-data">
     <label for="gameName">Game Name:</label>
     <input id="gameName" v-model="form.gameName" type="text" />
     <label for="image">Image:</label>

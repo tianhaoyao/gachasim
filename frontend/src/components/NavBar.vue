@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue';
 import { useUserStore } from '@UserModule/stores/UserStore';
 import { useGameStore } from '@GameModule/stores/GameStore';
 import { Game } from '@GameModule/models/Game';
-import axios from 'axios';
+import { callApi } from '@/callApi';
 import { storeToRefs } from 'pinia';
 
 defineOptions({
@@ -19,10 +19,9 @@ const { user } = storeToRefs(userStore);
 const { setSelectedGame } = useGameStore();
 
 const fetchGames = () => {
-  axios
-    .get(`/game/games/`)
+  callApi<Array<Game>>({ endpoint: '/game/games/' })
     .then((response) => {
-      games.value = response.data;
+      games.value = response;
     })
     .catch((error) => {
       console.log(error);

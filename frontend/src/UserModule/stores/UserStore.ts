@@ -30,7 +30,7 @@ export const useUserStore = defineStore<'user', UserStoreState, UserStoreGetters
         // you can directly mutate the state
         this.user = user;
 
-        // redict to home page if not already
+        // redirect to home page if not already
         if (this.router.currentRoute.value.path !== '/home') {
           this.router.push('/home');
         }
