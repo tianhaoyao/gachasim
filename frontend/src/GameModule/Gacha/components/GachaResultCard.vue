@@ -1,29 +1,24 @@
-<script lang="ts">
-import { defineComponent, PropType } from 'vue';
+<script setup lang="ts">
 import { Roll } from '../types';
 import { getColor, calculatePercent } from '../utils';
 import { RaritiesHashKey } from '../symbols';
 import { injectStrict } from '@/utils';
 
-export default defineComponent({
-  props: {
-    roll: {
-      type: Object as PropType<Roll>,
-      required: true,
-    },
-  },
-  setup() {
-    const raritiesHash = injectStrict(RaritiesHashKey);
+type Props = {
+  roll: Roll;
+};
 
-    return {
-      raritiesHash,
-    };
-  },
+defineOptions({
+  name: 'GachaResultCard',
   methods: {
     getColor,
     calculatePercent,
   },
 });
+
+defineProps<Props>();
+
+const raritiesHash = injectStrict(RaritiesHashKey);
 </script>
 
 <template>

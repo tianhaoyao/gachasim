@@ -1,91 +1,76 @@
-<script lang="ts">
-import { defineComponent, inject, provide, reactive } from 'vue';
+<script setup lang="ts">
+import { provide, reactive, ref, watch } from 'vue';
 import GachaResult from './GachaResult.vue';
 import axios from '@/axios-instance';
-import { Game } from '@GameModule/models/Game';
 import { RaritiesHashKey } from '../symbols';
 import { RaritiesHash, Roll } from '../types';
-import { mapState } from 'pinia';
 import { useGameStore } from '@GameModule/stores/GameStore';
+import { storeToRefs } from 'pinia';
 
-type GameViewData = {
-  rollResults: Array<Roll>;
-  game?: Game;
-  numRolls: number;
+defineOptions({
+  name: 'GameView',
+});
+
+const gameStore = useGameStore();
+
+const { selectedGame } = storeToRefs(gameStore);
+
+const raritiesHash = reactive<RaritiesHash>({});
+
+const setRaritiesHash = (res: RaritiesHash) => {
+  Object.assign(raritiesHash, res);
 };
 
-export default defineComponent({
-  name: 'GameView',
-  components: {
-    GachaResult,
-  },
-  setup() {
-    const raritiesHash = reactive<RaritiesHash>({});
+provide(RaritiesHashKey, raritiesHash);
 
-    const setRaritiesHash = (res: RaritiesHash) => {
-      Object.assign(raritiesHash, res);
-    };
+const rollResults = ref<Array<Roll>>([]);
 
-    provide(RaritiesHashKey, raritiesHash);
+const numRolls = ref<number>(10);
 
-    return {
-      setRaritiesHash,
-    };
-  },
-  data(): GameViewData {
-    return {
-      rollResults: [],
-      numRolls: 10,
-    };
-  },
-  computed: {
-    ...mapState(useGameStore, ['selectedGame']),
-  },
-  watch: {
-    selectedGame() {
-      this.fetchRarities();
-    },
-  },
-  mounted() {
-    this.fetchRarities();
-  },
-  methods: {
-    onRoll: function () {
-      if (!this.selectedGame) {
-        return;
-      }
+watch(selectedGame, async (selectedGame) => {
+  if (!selectedGame) {
+    return;
+  }
 
-      axios
-        .get(`/game/${this.selectedGame.id}/gacha/?format=json&numrolls=${this.numRolls}`)
-        .then((response) => {
-          this.rollResults = response.data;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    fetchRarities: function () {
-      if (!this.selectedGame) {
-        return;
-      }
-      axios
-        .get(`/game/rarities/`, { params: { game_id: this.selectedGame.id } })
-        .then((response) => {
-          const raritiesHash = response.data.reduce((acc, curr) => {
-            if (curr.pity != 0) {
-              acc[curr.id] = curr;
-            }
-            return acc;
-          }, {});
-
-          this.setRaritiesHash(raritiesHash);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-  },
+  fetchRarities();
 });
+
+const fetchRarities = () => {
+  if (!selectedGame.value) {
+    return;
+  }
+
+  axios
+    .get(`/game/rarities/`, { params: { game_id: selectedGame.value.id } })
+    .then((response) => {
+      const raritiesHash = response.data.reduce((acc, curr) => {
+        if (curr.pity != 0) {
+          acc[curr.id] = curr;
+        }
+        return acc;
+      }, {});
+
+      setRaritiesHash(raritiesHash);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const onRoll = () => {
+  if (!selectedGame.value) {
+    return;
+  }
+
+  axios
+    .get(`/game/${selectedGame.value.id}/gacha/?format=json&numrolls=${numRolls.value}`)
+    .then((response) => {
+      rollResults.value = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
 </script>
 
 <template>

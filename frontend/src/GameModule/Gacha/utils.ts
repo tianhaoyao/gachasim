@@ -8,9 +8,11 @@ export const getColor = ({
   color?: string;
 }) => {
   if (!softPity) return color;
+
   if (pityCount > softPity && softPity != 0) {
     return '#FF0000';
   }
+
   return color;
 };
 
@@ -24,5 +26,6 @@ export const calculatePercent = ({
   const percentage = rarityPity
     ? Math.min(Math.max(Math.floor((pityCount / rarityPity) * 100), 0), 100)
     : 0;
+
   return percentage + '%';
 };
