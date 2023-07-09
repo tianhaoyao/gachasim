@@ -1,62 +1,64 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { reactive } from 'vue';
 import axios from '@/axios-instance';
-import { mapState } from 'pinia';
 import { useUserStore } from '@UserModule/stores/UserStore';
+import { storeToRefs } from 'pinia';
 
-type ComponentData = {
-  form: {
-    gameName: Nullable<string>;
-    selectedImage: Nullable<File>;
-  };
+type Form = {
+  gameName: string;
+  selectedImage: Nullable<File>;
 };
 
-export default defineComponent({
+const initialForm = {
+  gameName: '',
+  selectedImage: null,
+};
+
+defineOptions({
   name: 'CreateNewGame',
-  data(): ComponentData {
-    return {
-      form: {
-        gameName: null,
-        selectedImage: null,
-      },
-    };
-  },
-  computed: {
-    ...mapState(useUserStore, ['user']),
-  },
-  methods: {
-    onSubmit() {
-      if (!this.form.gameName || !this.form.selectedImage || !this.user) {
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append('game_name', this.form.gameName);
-      formData.append('image', this.form.selectedImage);
-      formData.append('author_id', String(this.user.id));
-
-      axios
-        .post('/game/games/', formData)
-        .then((response) => {})
-        .catch((error) => {
-          console.error(error);
-        });
-    },
-    onChangeImageFile(event: Event) {
-      const target = event.target as HTMLInputElement;
-      const files = target.files;
-      if (files && files[0]) {
-        console.log('file', files[0]);
-        this.form.selectedImage = files[0];
-      }
-    },
-  },
 });
+
+const form = reactive<Form>(initialForm);
+
+const userStore = useUserStore();
+
+const { user } = storeToRefs(userStore);
+
+const onCreateNewGame = () => {
+  if (!form.gameName || !form.selectedImage || !user.value) {
+    return;
+  }
+
+  const formData = new FormData();
+
+  formData.append('game_name', form.gameName);
+  formData.append('image', form.selectedImage);
+  formData.append('author_id', String(user.value.id));
+
+  Object.assign(form, initialForm);
+
+  axios
+    .post('/game/games/', formData)
+    .then((response) => {})
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+const onChangeImageFile = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+
+  const files = target.files;
+
+  if (files && files[0]) {
+    form.selectedImage = files[0];
+  }
+};
 </script>
 
 <template>
   <router-link to="/home" class="button">DONE</router-link>
-  <form @submit.prevent="onSubmit">
+  <form @submit.prevent="onCreateNewGame">
     <label for="gameName">Game Name:</label>
     <input id="gameName" v-model="form.gameName" type="text" />
     <label for="image">Image:</label>

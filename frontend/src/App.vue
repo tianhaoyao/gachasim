@@ -1,17 +1,13 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import NavBar from './components/NavBar.vue';
 import { ThemeProvider } from 'vue3-styled-components';
 import { theme } from './theme';
 
-export default defineComponent({
+defineOptions({
   name: 'App',
   components: {
     NavBar,
     ThemeProvider,
-  },
-  setup() {
-    return { theme };
   },
 });
 </script>

@@ -1,104 +1,100 @@
-<script lang="ts">
+<script setup lang="ts">
 import { Game } from '@GameModule/models/Game';
 import axios from '@/axios-instance';
-import { defineComponent } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import keyBy from 'lodash/keyBy';
 
-type ComponentData = {
-  form: {
-    gameId: Nullable<number>;
-    rarityName: string;
-    chance: string;
-    pity: string;
-    softPity: string;
-    softPityChance: string;
-    color: string;
-  };
-  includePity: boolean;
-  includeSoftPity: boolean;
-  games: Array<Game>;
-  gamesHash: Record<number, Game>;
+type Form = {
+  gameId: Nullable<number>;
+  rarityName: string;
+  chance: string;
+  pity: string;
+  softPity: string;
+  softPityChance: string;
+  color: string;
 };
 
-export default defineComponent({
+const initialForm = {
+  gameId: null,
+  rarityName: '',
+  chance: '',
+  pity: '',
+  softPity: '',
+  softPityChance: '',
+  color: '#ffffff',
+};
+
+defineOptions({
   name: 'CreateNewRate',
-  data(): ComponentData {
-    return {
-      form: {
-        gameId: null,
-        rarityName: '',
-        chance: '',
-        pity: '',
-        softPity: '',
-        softPityChance: '',
-        color: '#ffffff',
-      },
-      includePity: false,
-      includeSoftPity: false,
-      games: [],
-      gamesHash: {},
-    };
-  },
-  computed: {
-    selectedGameName(): string {
-      return this.gamesHash[this.form.gameId ?? -1]?.game_name ?? '';
-    },
-  },
-  mounted() {
-    this.fetchGames();
-  },
-  methods: {
-    onSubmit() {
-      // Validate the form fields and construct the request payload
-      if (this.includePity && !this.form.pity) {
-        console.error('Please enter a value for Pity');
-        return;
-      }
-
-      if (
-        (this.includeSoftPity && !this.form.softPityChance) ||
-        (this.includeSoftPity && !this.form.softPity)
-      ) {
-        console.error('Please enter a value for Soft Pity Chance');
-        return;
-      }
-
-      const payload = {
-        game_id: this.form.gameId,
-        rarity_name: this.form.rarityName,
-        chance: this.form.chance,
-        pity: this.includePity ? this.form.pity : 0,
-        softpity: this.includeSoftPity ? this.form.softPity : 0,
-        softpitychance: this.includeSoftPity ? this.form.softPityChance : 0,
-        color: this.form.color,
-      };
-
-      axios
-        .post('/game/rarities/', payload)
-        .then((response) => {
-          console.log(response.data);
-          // Handle success response
-          console.log(payload);
-        })
-        .catch((error) => {
-          console.error(error);
-          console.log(payload);
-          console.log(error.response);
-        });
-    },
-    fetchGames() {
-      axios
-        .get('/game/games/')
-        .then((response) => {
-          this.games = response.data;
-          this.gamesHash = keyBy(this.games, 'id');
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
-  },
 });
+
+const form = reactive<Form>(initialForm);
+
+const includePity = ref(false);
+
+const includeSoftPity = ref(false);
+
+const games = ref<Array<Game>>([]);
+
+const gamesHash = ref<Record<number, Game>>({});
+
+const selectedGameName = form.gameId ? gamesHash[form.gameId]?.game_name ?? '' : '';
+
+onMounted(() => {
+  fetchGames();
+});
+
+const onSubmit = () => {
+  // Validate the form fields and construct the request payload
+  if (includePity.value && !form.pity) {
+    console.error('Please enter a value for Pity');
+    return;
+  }
+
+  if (
+    (includeSoftPity.value && !form.softPityChance) ||
+    (includeSoftPity.value && !form.softPity)
+  ) {
+    console.error('Please enter a value for Soft Pity Chance');
+    return;
+  }
+
+  const payload = {
+    game_id: form.gameId,
+    rarity_name: form.rarityName,
+    chance: form.chance,
+    pity: includePity.value ? form.pity : 0,
+    softpity: includeSoftPity.value ? form.softPity : 0,
+    softpitychance: includeSoftPity.value ? form.softPityChance : 0,
+    color: form.color,
+  };
+
+  axios
+    .post('/game/rarities/', payload)
+    .then((response) => {
+      console.log(response.data);
+      // Handle success response
+      console.log(payload);
+    })
+    .catch((error) => {
+      console.error(error);
+      console.log(payload);
+      console.log(error.response);
+    });
+};
+
+const fetchGames = () => {
+  axios
+    .get('/game/games/')
+    .then((response) => {
+      const fetchedGames = response.data;
+      games.value = fetchedGames;
+      gamesHash.value = keyBy(fetchedGames, 'id');
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
 </script>
 
 <template>
