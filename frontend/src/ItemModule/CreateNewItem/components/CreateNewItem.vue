@@ -1,109 +1,99 @@
-<script lang="ts">
-import { Game } from '@GameModule/models/Game';
+<script setup lang="ts">
+import { Game, GameId } from '@GameModule/models/Game';
 import { Rarity, RarityId } from '@RarityModule/models/Rarity';
 import axios from '@/axios-instance';
-import { defineComponent } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import keyBy from 'lodash/keyBy';
 
-type ComponentData = {
-  form: {
-    gameId: Nullable<number>;
-    rarityId: Nullable<RarityId>;
-    itemName: Nullable<string>;
-    selectedImage: Nullable<File>;
-    chance: number;
-  };
-  games: Array<Game>;
-  rarities: Array<Rarity>;
-  raritiesHash: Record<RarityId, Rarity>;
+type Form = {
+  gameId: Nullable<GameId>;
+  rarityId: Nullable<RarityId>;
+  itemName: string;
+  selectedImage: Nullable<File>;
+  chance: number;
 };
 
-export default defineComponent({
+const initialForm = {
+  gameId: null,
+  rarityId: null,
+  itemName: '',
+  selectedImage: null,
+  chance: 0,
+};
+
+defineOptions({
   name: 'CreateNewItem',
-  data(): ComponentData {
-    return {
-      form: {
-        gameId: null,
-        rarityId: null,
-        itemName: '',
-        selectedImage: null,
-        chance: 0.0,
-      },
-      games: [],
-      rarities: [],
-      raritiesHash: {},
-    };
-  },
-  computed: {
-    selectedRarityName(): string {
-      return this.raritiesHash?.[this.form.rarityId ?? -1]?.rarity_name ?? '';
-    },
-    isInvalidForm(): boolean {
-      return (
-        !this.form.chance || !this.form.itemName || !this.form.rarityId || !this.form.selectedImage
-      );
-    },
-  },
-  mounted() {
-    this.fetchGames();
-  },
-  methods: {
-    onSubmit() {
-      if (
-        !this.form.chance ||
-        !this.form.itemName ||
-        !this.form.rarityId ||
-        !this.form.selectedImage
-      )
-        return;
-
-      const formData = new FormData();
-      formData.append('rarity_id', this.form.rarityId.toString());
-      formData.append('item_name', this.form.itemName);
-      formData.append('image', this.form.selectedImage);
-      formData.append('chance', Number(this.form.chance).toString());
-
-      axios
-        .post('/game/items/', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
-        .then((response) => {})
-        .catch((error) => {});
-    },
-    handleImageChange(event: Event) {
-      const target = event.target as HTMLInputElement;
-      const files = target.files;
-      if (files !== null && files.length > 0) {
-        this.form.selectedImage = files[0];
-      }
-    },
-    fetchGames() {
-      axios
-        .get('/game/games/')
-        .then((response) => {
-          this.games = response.data;
-        })
-        .catch((error) => {});
-    },
-    fetchRarities() {
-      if (this.form.gameId === null) return;
-
-      axios
-        .get(`/game/rarities/`, { params: { game_id: this.form.gameId } })
-        .then((response) => {
-          const rarities = response.data;
-          this.rarities = rarities;
-          console.log(this.form.gameId);
-          this.raritiesHash = keyBy(rarities, 'id');
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
-  },
 });
+
+const form = reactive<Form>(initialForm);
+
+const games = ref<Array<Game>>([]);
+
+const rarities = ref<Array<Rarity>>([]);
+
+const raritiesHash = ref<Record<RarityId, Rarity>>({});
+
+const selectedRarityName = form.rarityId
+  ? raritiesHash.value?.[form.rarityId]?.rarity_name ?? ''
+  : '';
+
+onMounted(() => {
+  fetchGames();
+});
+
+const fetchGames = () => {
+  axios
+    .get('/game/games/')
+    .then((response) => {
+      games.value = response.data;
+    })
+    .catch((error) => {});
+};
+
+const fetchRarities = () => {
+  if (form.gameId === null) return;
+
+  axios
+    .get(`/game/rarities/`, { params: { game_id: form.gameId } })
+    .then((response) => {
+      const fetchedRarities = response.data;
+      rarities.value = fetchedRarities;
+      raritiesHash.value = keyBy(fetchedRarities, 'id');
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+const onSubmit = () => {
+  if (!form.chance || !form.itemName || !form.rarityId || !form.selectedImage) return;
+
+  const formData = new FormData();
+
+  formData.append('rarity_id', form.rarityId.toString());
+  formData.append('item_name', form.itemName);
+  formData.append('image', form.selectedImage);
+  formData.append('chance', Number(form.chance).toString());
+
+  Object.assign(form, initialForm);
+
+  axios
+    .post('/game/items/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    .then((response) => {})
+    .catch((error) => {});
+};
+
+const handleImageChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const files = target.files;
+  if (files !== null && files.length > 0) {
+    form.selectedImage = files[0];
+  }
+};
 </script>
 
 <template>
@@ -114,7 +104,9 @@ export default defineComponent({
       {{
         rarities
       }}
-      <option v-for="game in games" :key="game.id" :value="game.id">{{ game.game_name }}</option>
+      <option v-for="game in games" :key="game.id" :value="game.id">
+        {{ game.game_name }}
+      </option>
     </select>
 
     <label for="rate">Rarities:</label>
@@ -133,7 +125,7 @@ export default defineComponent({
     <label for="chance">Chance:</label>
     <input id="chance" v-model="form.chance" type="float" required />
     rate:{{ selectedRarityName }} itename:{{ form.itemName }} image:
-    {{ form.selectedImage }} chance{{ form.chance }}
+    {{ form.selectedImage?.name ?? '' }} chance{{ form.chance }}
     <button type="submit">Submit</button>
   </form>
 </template>

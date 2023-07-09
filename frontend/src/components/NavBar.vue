@@ -1,41 +1,36 @@
-<script lang="ts">
-import { Game } from '@GameModule/models/Game';
-import axios from 'axios';
-import { mapState, mapActions } from 'pinia';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import { useUserStore } from '@UserModule/stores/UserStore';
 import { useGameStore } from '@GameModule/stores/GameStore';
+import { Game } from '@GameModule/models/Game';
+import axios from 'axios';
+import { storeToRefs } from 'pinia';
 
-type NavBarData = {
-  games: Array<Game>;
+defineOptions({
+  name: 'NavBar',
+});
+
+const games = ref<Array<Game>>([]);
+
+const userStore = useUserStore();
+
+const { user } = storeToRefs(userStore);
+
+const { setSelectedGame } = useGameStore();
+
+const fetchGames = () => {
+  axios
+    .get(`/game/games/`)
+    .then((response) => {
+      games.value = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 };
 
-export default defineComponent({
-  name: 'NavBar',
-  data(): NavBarData {
-    return {
-      games: [],
-    };
-  },
-  computed: {
-    ...mapState(useUserStore, ['user']),
-  },
-  mounted() {
-    this.fetchGames();
-  },
-  methods: {
-    ...mapActions(useGameStore, ['setSelectedGame']),
-    fetchGames: function () {
-      axios
-        .get(`/game/games/`)
-        .then((response) => {
-          this.games = response.data;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-  },
+onMounted(() => {
+  fetchGames();
 });
 </script>
 
