@@ -29,6 +29,11 @@ export const useGameStore = defineStore<'Game', GameStoreState, GameStoreGetters
       setSelectedGame(Game: Game) {
         // you can directly mutate the state
         this.selectedGame = Game;
+
+        // redirect to home page if not already
+        if (this.router.currentRoute.value.path !== '/home') {
+          this.router.push('/home');
+        }
       },
     },
   }

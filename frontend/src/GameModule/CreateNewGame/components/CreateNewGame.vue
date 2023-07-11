@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
-import axios from '@/axios-instance';
 import { useUserStore } from '@UserModule/stores/UserStore';
 import { storeToRefs } from 'pinia';
+import { createNewGame } from '@GameModule/api/game';
 
 type Form = {
   gameName: string;
@@ -29,20 +29,13 @@ const onCreateNewGame = () => {
     return;
   }
 
-  const formData = new FormData();
-
-  formData.append('game_name', form.gameName);
-  formData.append('image', form.selectedImage);
-  formData.append('author_id', String(user.value.id));
+  createNewGame({
+    gameName: form.gameName,
+    selectedImage: form.selectedImage,
+    authorId: user.value.id,
+  });
 
   Object.assign(form, initialForm);
-
-  axios
-    .post('/game/games/', formData)
-    .then((response) => {})
-    .catch((error) => {
-      console.error(error);
-    });
 };
 
 const onChangeImageFile = (event: Event) => {

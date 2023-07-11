@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { Game, GameId } from '@GameModule/models/Game';
 import { Rarity, RarityId } from '@RarityModule/models/Rarity';
-import axios from '@/axios-instance';
-import { onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import keyBy from 'lodash/keyBy';
+import { fetchGames } from '@GameModule/api/game';
+import { fetchRarities } from '@RarityModule/api/rarity';
+import { createNewItem } from '@ItemModule/api/item';
 
 type Form = {
   gameId: Nullable<GameId>;
@@ -27,6 +29,10 @@ defineOptions({
 
 const form = reactive<Form>(initialForm);
 
+const gameId = computed(() => {
+  return form.gameId;
+});
+
 const games = ref<Array<Game>>([]);
 
 const rarities = ref<Array<Rarity>>([]);
@@ -37,54 +43,29 @@ const selectedRarityName = form.rarityId
   ? raritiesHash.value?.[form.rarityId]?.rarity_name ?? ''
   : '';
 
-onMounted(() => {
-  fetchGames();
+onMounted(async () => {
+  const fetchedGames = await fetchGames();
+
+  games.value = fetchedGames;
 });
 
-const fetchGames = () => {
-  axios
-    .get('/game/games/')
-    .then((response) => {
-      games.value = response.data;
-    })
-    .catch((error) => {});
-};
+watch(gameId, async (gameId) => {
+  if (!gameId) return;
 
-const fetchRarities = () => {
-  if (form.gameId === null) return;
+  const fetchedRarities = await fetchRarities({ gameId });
 
-  axios
-    .get(`/game/rarities/`, { params: { game_id: form.gameId } })
-    .then((response) => {
-      const fetchedRarities = response.data;
-      rarities.value = fetchedRarities;
-      raritiesHash.value = keyBy(fetchedRarities, 'id');
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-};
+  rarities.value = fetchedRarities;
 
-const onSubmit = () => {
+  raritiesHash.value = keyBy(fetchedRarities, 'id');
+});
+
+const onCreateNewItem = () => {
   if (!form.chance || !form.itemName || !form.rarityId || !form.selectedImage) return;
-
-  const formData = new FormData();
-
-  formData.append('rarity_id', form.rarityId.toString());
-  formData.append('item_name', form.itemName);
-  formData.append('image', form.selectedImage);
-  formData.append('chance', Number(form.chance).toString());
 
   Object.assign(form, initialForm);
 
-  axios
-    .post('/game/items/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
-    .then((response) => {})
-    .catch((error) => {});
+  // TODO: Figure out why it still needs type assertion after the condition above
+  createNewItem(form as Parameters<typeof createNewItem>[0]);
 };
 
 const handleImageChange = (event: Event) => {
@@ -98,9 +79,9 @@ const handleImageChange = (event: Event) => {
 
 <template>
   <router-link to="/home" class="button">DONE</router-link>
-  <form @submit.prevent="onSubmit">
+  <form @submit.prevent="onCreateNewItem">
     <label for="game">Game:</label>
-    <select v-model="form.gameId" @change="fetchRarities">
+    <select v-model="form.gameId">
       {{
         rarities
       }}

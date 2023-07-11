@@ -1,53 +1,26 @@
-<script>
-import axios from '@/axios-instance';
-import { useUserStore } from '@UserModule/stores/UserStore';
-import { mapActions } from 'pinia';
+<script setup lang="ts">
+import { login } from '@/UserModule/api/login';
+import { ref } from 'vue';
 
-export default {
+defineOptions({
   name: 'LoginPage',
-  data() {
-    return {
-      username: '',
-      password: '',
-    };
-  },
-  methods: {
-    login() {
-      axios
-        .post('/auth/token/', {
-          username: this.username,
-          password: this.password,
-        })
-        .then((response) => {
-          // Save the access token in local storage or Vuex store
-          const accessToken = response.data.access;
-          localStorage.setItem('accessToken', accessToken);
-          this.getUserInfo();
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
-    ...mapActions(useUserStore, ['setUser']),
-    getUserInfo() {
-      axios
-        .get('/auth/user-details/')
-        .then((response) => {
-          // Save the access token in local storage or Vuex store
-          this.setUser(response.data);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
-  },
+});
+
+const userName = ref('');
+const password = ref('');
+
+const handleLogin = async () => {
+  login({
+    userName: userName.value,
+    password: password.value,
+  });
 };
 </script>
 
 <template>
   <div>
-    <input v-model="username" placeholder="Username" />
+    <input v-model="userName" placeholder="Username" />
     <input v-model="password" placeholder="Password" type="password" />
-    <button @click="login">Login</button>
+    <button @click="handleLogin">Login</button>
   </div>
 </template>
