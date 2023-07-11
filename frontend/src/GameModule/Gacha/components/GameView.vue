@@ -6,7 +6,8 @@ import { RaritiesHashKey } from '../symbols';
 import { RaritiesHash, Roll } from '../types';
 import { useGameStore } from '@GameModule/stores/GameStore';
 import { storeToRefs } from 'pinia';
-import { Rarity } from '@RarityModule/models/Rarity';
+import keyBy from 'lodash/keyBy';
+import { fetchRarities } from '@RarityModule/api/rarity';
 
 defineOptions({
   name: 'GameView',
@@ -33,32 +34,14 @@ watch(selectedGame, async (selectedGame) => {
     return;
   }
 
-  fetchRarities();
+  const rarities = await fetchRarities({
+    gameId: selectedGame.id,
+  });
+
+  const raritiesHash = keyBy(rarities, 'id');
+
+  setRaritiesHash(raritiesHash);
 });
-
-const fetchRarities = () => {
-  if (!selectedGame.value) {
-    return;
-  }
-
-  callApi<Array<Rarity>>({
-    endpoint: `/game/rarities/`,
-    params: { game_id: selectedGame.value.id },
-  })
-    .then((response) => {
-      const raritiesHash = response.reduce((acc, curr) => {
-        if (curr.pity != 0) {
-          acc[curr.id] = curr;
-        }
-        return acc;
-      }, {});
-
-      setRaritiesHash(raritiesHash);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
 
 const onRoll = () => {
   if (!selectedGame.value) {

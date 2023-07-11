@@ -3,8 +3,8 @@ import { ref, onMounted } from 'vue';
 import { useUserStore } from '@UserModule/stores/UserStore';
 import { useGameStore } from '@GameModule/stores/GameStore';
 import { Game } from '@GameModule/models/Game';
-import { callApi } from '@/callApi';
 import { storeToRefs } from 'pinia';
+import { fetchGames } from '@GameModule/api/game';
 
 defineOptions({
   name: 'NavBar',
@@ -18,18 +18,10 @@ const { user } = storeToRefs(userStore);
 
 const { setSelectedGame } = useGameStore();
 
-const fetchGames = () => {
-  callApi<Array<Game>>({ endpoint: '/game/games/' })
-    .then((response) => {
-      games.value = response;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
+onMounted(async () => {
+  const fetchedGames = await fetchGames();
 
-onMounted(() => {
-  fetchGames();
+  games.value = fetchedGames;
 });
 </script>
 

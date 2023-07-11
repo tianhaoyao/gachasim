@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
-import { callApi } from '@/callApi';
 import { useUserStore } from '@UserModule/stores/UserStore';
 import { storeToRefs } from 'pinia';
+import { createNewGame } from '@GameModule/api/game';
 
 type Form = {
   gameName: string;
@@ -29,27 +29,13 @@ const onCreateNewGame = () => {
     return;
   }
 
-  const formData = new FormData();
-
-  formData.append('game_name', form.gameName);
-  formData.append('image', form.selectedImage);
-  formData.append('author_id', String(user.value.id));
+  createNewGame({
+    gameName: form.gameName,
+    selectedImage: form.selectedImage,
+    authorId: user.value.id,
+  });
 
   Object.assign(form, initialForm);
-
-  const requestInit = {
-    method: 'POST',
-    body: formData,
-  };
-
-  callApi({
-    endpoint: '/game/games/',
-    requestInit: requestInit,
-  })
-    .then((response) => {})
-    .catch((error) => {
-      console.error(error);
-    });
 };
 
 const onChangeImageFile = (event: Event) => {
@@ -65,7 +51,7 @@ const onChangeImageFile = (event: Event) => {
 
 <template>
   <router-link to="/home" class="button">DONE</router-link>
-  <form @submit.prevent="onCreateNewGame" enctype="multipart/form-data">
+  <form @submit.prevent="onCreateNewGame">
     <label for="gameName">Game Name:</label>
     <input id="gameName" v-model="form.gameName" type="text" />
     <label for="image">Image:</label>

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { Game } from '@GameModule/models/Game';
-import { callApi } from '@/callApi';
+import { Game, GameId } from '@GameModule/models/Game';
 import { onMounted, reactive, ref } from 'vue';
 import keyBy from 'lodash/keyBy';
+import { fetchGames } from '@GameModule/api/game';
+import { createNewRarity } from '@RarityModule/api/rarity';
 
 type Form = {
   gameId: Nullable<number>;
@@ -40,11 +41,18 @@ const gamesHash = ref<Record<number, Game>>({});
 
 const selectedGameName = form.gameId ? gamesHash[form.gameId]?.game_name ?? '' : '';
 
-onMounted(() => {
-  fetchGames();
+onMounted(async () => {
+  const fetchedGames = await fetchGames();
+
+  games.value = fetchedGames;
+
+  gamesHash.value = keyBy(fetchedGames, 'id');
 });
 
-const onSubmit = () => {
+const onCreateNewRarity = () => {
+  if (!form.gameId) {
+    console.error('Please select a game first');
+  }
   // Validate the form fields and construct the request payload
   if (includePity.value && !form.pity) {
     console.error('Please enter a value for Pity');
@@ -59,53 +67,22 @@ const onSubmit = () => {
     return;
   }
 
-  const payload = {
-    game_id: form.gameId,
-    rarity_name: form.rarityName,
-    chance: form.chance,
-    pity: includePity.value ? form.pity : 0,
-    softpity: includeSoftPity.value ? form.softPity : 0,
-    softpitychance: includeSoftPity.value ? form.softPityChance : 0,
-    color: form.color,
-  };
+  Object.assign(form, initialForm);
 
-  const requestInit = {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  };
-
-  callApi({
-    endpoint: '/game/rarities/',
-    requestInit: requestInit,
-  })
-    .then((response) => {
-      console.log(response);
-    })
-    .catch((error) => {
-      console.error(error);
-      console.log(payload);
-      console.log(error.response);
-    });
-};
-
-const fetchGames = () => {
-  callApi<Array<Game>>({
-    endpoint: '/game/games/',
-  })
-    .then((response) => {
-      const fetchedGames = response;
-      games.value = fetchedGames;
-      gamesHash.value = keyBy(fetchedGames, 'id');
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  createNewRarity({
+    // TODO: Figure our why TS isn't working automatically from the check
+    ...(form as Form & {
+      gameId: GameId;
+    }),
+    includePity: includePity.value,
+    includeSoftPity: includeSoftPity.value,
+  }); // TODO: Why TS doesn't work properly?
 };
 </script>
 
 <template>
   <router-link to="/home" class="button">DONE</router-link>
-  <form @submit.prevent="onSubmit">
+  <form @submit.prevent="onCreateNewRarity">
     <label for="game">Game:</label>
     <select v-model="form.gameId">
       <option v-for="game in games" :key="game.id" :value="game.id">{{ game.game_name }}</option>
